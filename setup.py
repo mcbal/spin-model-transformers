@@ -1,15 +1,15 @@
 from setuptools import find_packages, setup
 
 setup(
-    name="afem-jax",
+    name="ising-transformers",
     packages=find_packages(exclude=[""]),
     version="0.0.0",
     license="Apache License 2.0",
-    description="Approximate Free-Energy Minimization - JAX",
+    description="Ising Transformers",
     author="Matthias Bal",
     author_email="matthiascbal@gmail.com",
     long_description_content_type="text/markdown",
-    url="https://github.com/mcbal/afem-jax",
+    url="https://github.com/mcbal/ising-transformers",
     install_requires=[
         "einops>=0.4",
         "equinox>=0.5",
