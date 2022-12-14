@@ -3,7 +3,7 @@ from setuptools import find_packages, setup
 setup(
     name="ising-transformers-jax",
     packages=find_packages(exclude=["examples", "notebooks"]),
-    version="0.0.0",
+    version="0.0.1",
     license="MIT",
     description="Ising Transformers in JAX",
     author="Matthias Bal",
