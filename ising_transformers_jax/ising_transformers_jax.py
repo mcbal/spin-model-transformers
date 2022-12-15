@@ -53,7 +53,6 @@ class IsingTransformerLayer(eqx.Module):
 
         self.to_qk = eqx.nn.Linear(dim, 2 * dim_head * num_heads, use_bias=False, key=key)
 
-    @eqx.filter_jit
     def _J(self, x, mask=None):
         x = rearrange(x, "...  h n d -> ... n (h d)", h=self.num_heads)
 
@@ -67,15 +66,12 @@ class IsingTransformerLayer(eqx.Module):
 
         return jax.nn.softmax(sim, axis=-1) / jnp.sqrt(self.dim_head)
 
-    @eqx.filter_jit
     def _log_Z(self, h, mask, beta):
-        @jax.jit
         def _log_Z_head(h, J, beta):
             return -_log_Z(_t_star_root(h, J, beta), h, J, beta) / beta
 
         return jax.vmap(_log_Z_head, in_axes=(0, 0, None))(h=h, J=self._J(h, mask=mask), beta=beta)
 
-    @eqx.filter_jit
     def __call__(self, x, mask=None):
         x = rearrange(x, "...  n (h d) -> ... h n d", h=self.num_heads, d=self.dim_head)
         x = x / jnp.linalg.norm(x, axis=-1, keepdims=True)
@@ -104,7 +100,6 @@ class IsingTransformer(eqx.Module):
             ],
         )
 
-    @eqx.filter_jit
     def __call__(self, x, mask=None):
         def apply_scan_fn(x, layer):
             return layer(x, mask=mask), None
