@@ -23,7 +23,7 @@ def _log_Z(t, h, J, beta):
 def _t_star_root(h, J, beta):
     a = beta
     b = -0.5
-    c = -0.25 * beta * jnp.einsum("... i f, ... i f -> ... i", h, h) - 0.5 * jnp.diagonal(J, axis1=-1, axis2=-2)
+    c = -0.25 * beta * jnp.einsum("... i f, ... i f -> ... i", h, h)
     return ((-b + jnp.sqrt(b**2 - 4 * a * c)) / (2 * a)) * jnp.ones(*h.shape[:-1], dtype=h.dtype)
 
 
