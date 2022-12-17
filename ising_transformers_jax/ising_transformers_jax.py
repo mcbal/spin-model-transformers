@@ -5,6 +5,14 @@ import jax.random as jrandom
 from einops import rearrange
 
 
+def _t_star(h, J, beta):
+    del J
+    a = beta
+    b = -0.5
+    c = -0.25 * beta * jnp.einsum("... i f, ... i f -> ... i", h, h)
+    return ((-b + jnp.sqrt(b**2 - 4 * a * c)) / (2 * a)) * jnp.ones(*h.shape[:-1], dtype=h.dtype)
+
+
 def _phi(t, h, J, beta):
     V = jnp.diag(t) - J
     V_inv = jnp.linalg.solve(V, jnp.eye(t.shape[-1]))
@@ -18,13 +26,6 @@ def _phi(t, h, J, beta):
 
 def _log_Z(t, h, J, beta):
     return -0.5 * h.shape[-2] * (1.0 + jnp.log(2.0 * beta)) + _phi(t, h, J, beta)
-
-
-def _t_star_root(h, J, beta):
-    a = beta
-    b = -0.5
-    c = -0.25 * beta * jnp.einsum("... i f, ... i f -> ... i", h, h)
-    return ((-b + jnp.sqrt(b**2 - 4 * a * c)) / (2 * a)) * jnp.ones(*h.shape[:-1], dtype=h.dtype)
 
 
 class IsingTransformerLayer(eqx.Module):
@@ -68,7 +69,7 @@ class IsingTransformerLayer(eqx.Module):
 
     def _log_Z(self, h, mask, beta):
         def _log_Z_head(h, J, beta):
-            return -_log_Z(_t_star_root(h, J, beta), h, J, beta) / beta
+            return _log_Z(_t_star(h, J, beta), h, J, beta)
 
         return jax.vmap(_log_Z_head, in_axes=(0, 0, None))(h=h, J=self._J(h, mask=mask), beta=beta)
 
