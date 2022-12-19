@@ -5,7 +5,7 @@ import jax.random as jrandom
 from einops import rearrange
 
 
-def _t_star(h, J, beta):
+def _t_star_positive_root(h, J, beta):
     del J
     a = beta
     b = -0.5
@@ -53,6 +53,7 @@ class IsingTransformerLayer(eqx.Module):
         self.beta = beta
 
         self.to_qk = eqx.nn.Linear(dim, 2 * dim_head * num_heads, use_bias=False, key=key)
+        self.t_star_fun = _t_star_positive_root
 
     def _J(self, x, mask=None):
         x = rearrange(x, "...  h n d -> ... n (h d)", h=self.num_heads)
@@ -69,16 +70,16 @@ class IsingTransformerLayer(eqx.Module):
 
     def _log_Z(self, h, mask, beta):
         def _log_Z_head(h, J, beta):
-            return _log_Z(_t_star(h, J, beta), h, J, beta)
+            return _log_Z(self.t_star_fun(h, J, beta), h, J, beta)
 
         return jax.vmap(_log_Z_head, in_axes=(0, 0, None))(h=h, J=self._J(h, mask=mask), beta=beta)
 
     def __call__(self, x, mask=None):
         x = rearrange(x, "...  n (h d) -> ... h n d", h=self.num_heads, d=self.dim_head)
-        x = x / jnp.linalg.norm(x, axis=-1, keepdims=True)
+        h = x / jnp.linalg.norm(x, axis=-1, keepdims=True)
 
         magnetizations = rearrange(
-            jnp.diagonal(jax.jacrev(self._log_Z / self.beta, argnums=0)(x, mask=mask, beta=self.beta)),
+            jnp.diagonal(jax.jacrev(self._log_Z / self.beta, argnums=0)(h, mask=mask, beta=self.beta)),
             "... n d h -> ... n (h d)",
             h=self.num_heads,
         )
