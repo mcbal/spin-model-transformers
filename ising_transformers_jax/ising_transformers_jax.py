@@ -5,15 +5,7 @@ import jax.random as jrandom
 from einops import rearrange
 
 
-def _t_star_positive_root(h, J, beta):
-    del J
-    a = beta
-    b = -0.5
-    c = -0.25 * beta * jnp.einsum("... i f, ... i f -> ... i", h, h)
-    return ((-b + jnp.sqrt(b**2 - 4 * a * c)) / (2 * a)) * jnp.ones(*h.shape[:-1], dtype=h.dtype)
-
-
-def _phi(t, h, J, beta):
+def phi(t, h, J, beta):
     V = jnp.diag(t) - J
     V_inv = jnp.linalg.solve(V, jnp.eye(t.shape[-1]))
     sign, logdet = jnp.linalg.slogdet(V)
@@ -24,8 +16,16 @@ def _phi(t, h, J, beta):
     )
 
 
-def _log_Z(t, h, J, beta):
-    return -0.5 * h.shape[-2] * (1.0 + jnp.log(2.0 * beta)) + _phi(t, h, J, beta)
+def log_Z(t, h, J, beta):
+    return -0.5 * h.shape[-2] * (1.0 + jnp.log(2.0 * beta)) + phi(t, h, J, beta)
+
+
+def t_star(h, J, beta):
+    del J
+    a = beta
+    b = -0.5
+    c = -0.25 * beta * jnp.einsum("... i f, ... i f -> ... i", h, h)
+    return ((-b + jnp.sqrt(b**2 - 4 * a * c)) / (2 * a)) * jnp.ones(*h.shape[:-1], dtype=h.dtype)
 
 
 class IsingTransformerLayer(eqx.Module):
@@ -53,7 +53,6 @@ class IsingTransformerLayer(eqx.Module):
         self.beta = beta
 
         self.to_qk = eqx.nn.Linear(dim, 2 * dim_head * num_heads, use_bias=False, key=key)
-        self.t_star_fun = _t_star_positive_root
 
     def _J(self, x, mask=None):
         x = rearrange(x, "...  h n d -> ... n (h d)", h=self.num_heads)
@@ -66,25 +65,23 @@ class IsingTransformerLayer(eqx.Module):
         if mask is not None:
             sim = jnp.where(mask, sim, jnp.finfo(sim.dtype).min)
 
-        return jax.nn.softmax(sim, axis=-1) / jnp.sqrt(self.dim_head)
+        return jax.nn.softmax(sim, axis=-1) * self.dim_head**-0.5
 
-    def _log_Z(self, h, mask, beta):
-        def _log_Z_head(h, J, beta):
-            return _log_Z(self.t_star_fun(h, J, beta), h, J, beta)
+    def _F(self, h, mask, beta):
+        def _F_head(h, J, beta):
+            return -log_Z(t_star(h, J, beta), h, J, beta) / beta
 
-        return jax.vmap(_log_Z_head, in_axes=(0, 0, None))(h=h, J=self._J(h, mask=mask), beta=beta)
+        return jax.vmap(_F_head, in_axes=(0, 0, None))(h, self._J(h, mask=mask), beta)
 
     def __call__(self, x, mask=None):
         x = rearrange(x, "...  n (h d) -> ... h n d", h=self.num_heads, d=self.dim_head)
-        h = x / jnp.linalg.norm(x, axis=-1, keepdims=True)
+        x = x / jnp.linalg.norm(x, axis=-1, keepdims=True)
 
-        magnetizations = rearrange(
-            jnp.diagonal(jax.jacrev(self._log_Z / self.beta, argnums=0)(h, mask=mask, beta=self.beta)),
+        return -rearrange(
+            jnp.diagonal(jax.jacrev(self._F, argnums=0)(x, mask=mask, beta=self.beta)),
             "... n d h -> ... n (h d)",
             h=self.num_heads,
         )
-
-        return magnetizations
 
 
 class IsingTransformer(eqx.Module):

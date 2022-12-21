@@ -2,7 +2,7 @@
 
 Experimental implementation of Ising transformers in JAX.
 
-**Blog post: [Ising Transformers in JAX: A Class of Physics-Inspired Transformer Modules](https://mcbal.github.io/post/ising-transformers-in-jax/)** [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/mcbal/ising-transformers-jax/blob/main/blog/ising_transformers_in_jax.ipynb)
+**Blog post: [Ising Transformers in JAX: A Physics-Inspired Class of Transformer Modules](https://mcbal.github.io/post/ising-transformers-jax/)** [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/mcbal/ising-transformers-jax/blob/main/blog/ising_transformers_jax.ipynb)
 
 ## Install
 
@@ -20,10 +20,10 @@ $ pip install -e .
 
 ```bibtex
 @article{bal2022isingtransformers,
-  title   = {Ising Transformers in JAX: A Class of Physics-Inspired Transformer Modules},
+  title   = {Ising Transformers in JAX: A Physics-Inspired Class of Transformer Modules},
   author  = {Bal, Matthias},
   year    = {2022},
   month   = {December},
-  url     = {https://mcbal.github.io/post/ising-transformers-in-jax/}
+  url     = {https://mcbal.github.io/post/ising-transformers-jax/}
 }
 ```
