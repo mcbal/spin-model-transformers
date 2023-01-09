@@ -1,14 +1,14 @@
 from setuptools import find_packages, setup
 
 setup(
-    name="ising-transformers-jax",
-    packages=find_packages(exclude=["examples", "notebooks"]),
+    name="spin-glass-transformers",
+    packages=find_packages(exclude=["examples"]),
     version="0.0.1",
     license="MIT",
-    description="Ising Transformers in JAX",
+    description="Implementation of spin-glass transformers in JAX",
     author="Matthias Bal",
     author_email="matthiascbal@gmail.com",
-    url="https://github.com/mcbal/ising-transformers-jax",
+    url="https://github.com/mcbal/spin-glass-transformers",
     install_requires=[
         "einops>=0.6",
         "equinox>=0.9.2",
