@@ -1,1 +1,1 @@
-from ising_transformers_jax import IsingTransformer, IsingTransformerLayer  # noqa: F401
+from spin_glass_transformers.spin_glass_transformers import DiagonalVectorSpinGlassAttention, Transformer  # noqa: F401
