@@ -24,7 +24,7 @@ $ pip install -e .
   title   = {Spin-Glass Transformers: A Physics-Inspired Class of Transformer Modules},
   author  = {Bal, Matthias},
   year    = {2023},
-  month   = {January},
+  month   = {February},
   url     = {https://mcbal.github.io/}
 }
 ```
