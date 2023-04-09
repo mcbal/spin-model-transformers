@@ -1,8 +1,8 @@
-# Spin-glass transformers in JAX
+# Spin-model transformers in JAX
 
-Exploring connections between transformer neural networks and (non-)equilibrium statistical mechanics in JAX.
+Exploring connections between transformer neural networks, spin models, and (non-)equilibrium statistical mechanics in JAX.
 
-**Blog post (at some point): [Spin-Glass Transformers: A Physics-Inspired Class of Transformer Modules](https://mcbal.github.io/) [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/)**
+**Blog post: [Spin-Model Transformers: A Physics-Inspired Class of Transformer Modules](https://mcbal.github.io/)** (work in progress)
 
 
 ## Summary

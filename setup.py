@@ -1,14 +1,14 @@
 from setuptools import find_packages, setup
 
 setup(
-    name="spin-glass-transformers",
+    name="spin-model-transformers",
     packages=find_packages(exclude=["examples"]),
     version="0.0.1",
     license="MIT",
-    description="Implementation of spin-glass transformers in JAX",
+    description="Implementation of spin-model transformers in JAX",
     author="Matthias Bal",
     author_email="matthiascbal@gmail.com",
-    url="https://github.com/mcbal/spin-glass-transformers",
+    url="https://github.com/mcbal/spin-model-transformers",
     install_requires=[
         "einops>=0.6",
         "equinox>=0.9.2",
