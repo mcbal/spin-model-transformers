@@ -1,10 +1,11 @@
 from setuptools import find_packages, setup
 
+
 setup(
     name="spin-model-transformers",
-    packages=find_packages(exclude=["examples"]),
+    packages=find_packages(exclude=["examples", "notebooks", "tests"]),
     version="0.0.1",
-    license="MIT",
+    license="Apache-2.0",
     description="Implementation of spin-model transformers in JAX",
     author="Matthias Bal",
     author_email="matthiascbal@gmail.com",
