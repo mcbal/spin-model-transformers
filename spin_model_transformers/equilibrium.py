@@ -15,7 +15,6 @@
 
 import jax
 import jax.numpy as jnp
-
 from einops import rearrange
 from equinox import Module, nn, static_field
 
@@ -38,7 +37,9 @@ def phi_diag(t, h, J, beta):
     return (
         beta * jnp.sum(t, axis=-1)
         - 0.5 * safe_log(v).sum(axis=-1)
-        + 0.25 * beta * jnp.einsum("... i f, ... i, ... i f -> ...", h, safe_reciprocal(v), h)
+        + 0.25
+        * beta
+        * jnp.einsum("... i f, ... i, ... i f -> ...", h, safe_reciprocal(v), h)
     )
 
 
@@ -49,12 +50,15 @@ def log_Z_diag(t, h, J, beta):
 def t_star_diag(h, J, beta):
     a = beta
     b = -0.5 - 2 * beta * J
-    c = beta * J**2 + 0.5 * J - 0.25 * beta * jnp.einsum("... i f, ... i f -> ... i", h, h)
+    c = (
+        beta * J**2
+        + 0.5 * J
+        - 0.25 * beta * jnp.einsum("... i f, ... i f -> ... i", h, h)
+    )
     return (-b + jnp.sqrt(b**2 - 4 * a * c)) / (2 * a)
 
 
 class DiagonalVectorSpinGlassAttention(Module):
-
     dim: int = static_field()
     dim_head: int = static_field()
     num_heads: int = static_field()
@@ -83,7 +87,9 @@ class DiagonalVectorSpinGlassAttention(Module):
         x = rearrange(x, "...  h n d -> ... n (h d)", h=self.num_heads)
 
         q, k = jnp.split(jax.vmap(self.to_qk)(x), 2, axis=-1)
-        q, k = map(lambda t: rearrange(t, "... n (h d) -> ... h n d", h=self.num_heads), (q, k))
+        q, k = map(
+            lambda t: rearrange(t, "... n (h d) -> ... h n d", h=self.num_heads), (q, k)
+        )
 
         sim = jnp.einsum("... i d, ... j d -> ... i j", q, k)
 
@@ -96,14 +102,20 @@ class DiagonalVectorSpinGlassAttention(Module):
         def _free_energy(x, J, beta):
             return -log_Z_diag(t_star_diag(x, J, beta)(x, J, beta), x, J, beta) / beta
 
-        return jax.vmap(_free_energy, in_axes=(0, 0, None))(x, self._J(x, mask=mask), beta)
+        return jax.vmap(_free_energy, in_axes=(0, 0, None))(
+            x, self._J(x, mask=mask), beta
+        )
 
     def __call__(self, x, mask):
         x = rearrange(x, "...  n (h d) -> ... h n d", h=self.num_heads, d=self.dim_head)
         x = x / jnp.linalg.norm(x, axis=-1, keepdims=True)
 
         return -rearrange(
-            jnp.diagonal(jax.jacrev(self._multi_head_free_energy, argnums=0)(x, mask=mask, beta=self.beta)),
+            jnp.diagonal(
+                jax.jacrev(self._multi_head_free_energy, argnums=0)(
+                    x, mask=mask, beta=self.beta
+                )
+            ),
             "... n d h -> ... n (h d)",
             h=self.num_heads,
         )
