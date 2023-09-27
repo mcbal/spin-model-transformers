@@ -13,13 +13,13 @@
 # limitations under the License.
 
 
-import jax
+import jax.lax as lax
 import jax.numpy as jnp
 import numpy as np
 
 
 def bessel_iv_ratio(x, nu, num_iter):
-    """Compute approximation of I_{\nu+1}(x) / I_{\nu}(x) for any x>=0 and nu>=0.
+    """Compute approximation of ratio `I_{\nu+1}(x) / I_{\nu}(x)` of modified Bessel functions of the first kind.
 
     Reference:
         D. E. Amos, Computation of Modified Bessel Functions and Their Ratios.
@@ -43,9 +43,9 @@ def bessel_iv_ratio(x, nu, num_iter):
 
     def _refine(r):
         def _inner(r, step):
-            return jax.lax.scan(
+            return lax.scan(
                 lambda r, idx: (
-                    jax.lax.cond(
+                    lax.cond(
                         idx < num_iter - step - 1,
                         lambda r, idx: _update(r, idx),
                         lambda r, idx: r,
@@ -58,12 +58,12 @@ def bessel_iv_ratio(x, nu, num_iter):
                 jnp.arange(num_iter - 1),
             )[0]
 
-        return jax.lax.scan(
+        return lax.scan(
             lambda r, step: (_inner(r, step), None), r, jnp.arange(num_iter)
         )[0]
 
     def _maybe_recurse(y):
-        return jax.lax.scan(
+        return lax.scan(
             lambda y, kk: (1.0 / (2 * kk / x + y), None),
             y,
             jnp.arange(v, stop=nu, step=-1),
