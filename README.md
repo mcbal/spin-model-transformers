@@ -1,8 +1,10 @@
-# Spin-model transformers in JAX
+# Spin-model transformers
 
 
-## Setup
+## Install
 
 ```bash
-pip install -e .
+pip install -e .[dev]
+pre-commit install
+pre-commit run --all-files
 ```

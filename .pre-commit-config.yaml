@@ -1,6 +1,6 @@
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.3.0
+    rev: v4.4.0
     hooks:
       - id: check-added-large-files
       - id: check-ast
@@ -16,18 +16,19 @@ repos:
       - id: trailing-whitespace
         types: [python]
   - repo: https://github.com/ambv/black
-    rev: 23.3.0
+    rev: 23.9.1
     hooks:
     - id: black
   - repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: 'v0.0.263'
+    rev: 'v0.0.291'
     hooks:
       - id: ruff
+        args: ['--fix']
   - repo: https://github.com/nbQA-dev/nbQA
     rev: 1.7.0
     hooks:
     - id: nbqa-black
       additional_dependencies: [ipython, black]
     - id: nbqa-ruff 
-      args: ["--ignore=I001"]
+      args: ['--ignore=I001']
       additional_dependencies: [ipython, ruff]

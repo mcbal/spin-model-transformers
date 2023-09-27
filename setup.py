@@ -1,22 +1,36 @@
 from setuptools import find_packages, setup
 
 
+with open("README.md", "r") as fh:
+    long_description = fh.read()
+
 setup(
     name="spin-model-transformers",
-    packages=find_packages(exclude=["examples", "notebooks", "tests"]),
     version="0.0.1",
-    license="Apache-2.0",
-    description="Implementation of spin-model transformers in JAX",
     author="Matthias Bal",
     author_email="matthiascbal@gmail.com",
+    description="Physics-inspired transformer modules based on mean-field dynamics of vector-spin models",
+    long_description=long_description,
+    long_description_content_type="text/markdown",
     url="https://github.com/mcbal/spin-model-transformers",
+    license="Apache-2.0",
+    packages=find_packages(exclude=["examples", "notebooks", "tests"]),
+    python_requires=">=3.9",
     install_requires=[
-        "einops>=0.6",
-        "equinox>=0.9.2",
-        "jax>=0.3.25",
-        "jaxlib>=0.3.25",
-        "jaxopt>=0.5.5",
+        "einops>=0.6.1",
+        "equinox>=0.10.11",
+        "jax>=0.4.13",
+        "jaxlib>=0.4.13",
+        "jaxopt>=0.8",
         "numpy",
-        "optax>=0.1.4",
+        "optax>=0.1.7",
     ],
+    extras_require={
+        "dev": [
+            "black~=23.9.1",
+            "nbqa~=1.7",
+            "pre-commit~=3.4.0",
+            "ruff~=0.0.291",
+        ]
+    },
 )
