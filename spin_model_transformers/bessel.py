@@ -19,7 +19,7 @@ import numpy as np
 
 
 def bessel_iv_ratio(x, nu, num_iter):
-    """Compute approximation of ratio `I_{\nu+1}(x) / I_{\nu}(x)` of modified Bessel functions of the first kind.
+    """Compute ratio `I_{\nu+1}(x) / I_{\nu}(x)` of modified Bessel functions of the first kind.
 
     Reference:
         D. E. Amos, Computation of Modified Bessel Functions and Their Ratios.
