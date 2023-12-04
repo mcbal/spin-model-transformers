@@ -123,8 +123,10 @@ class SpinTransformerModule(eqx.Module):
         *,
         dim,
         num_heads,
-        beta,
         key,
+        beta=1.0,
+        solver_tol=1e-3,
+        solver_maxiter=100,
     ):
         super().__init__()
 
@@ -137,7 +139,11 @@ class SpinTransformerModule(eqx.Module):
             dim, 2 * self.dim_head * num_heads, use_bias=False, key=key
         )
         self.vector_tap_fp = partial(
-            vector_tap_fp, beta=beta, R=(self.dim_head / 2 - 1) ** 0.5
+            vector_tap_fp,
+            beta=beta,
+            R=(self.dim_head / 2 - 1) ** 0.5,
+            tol=solver_tol,
+            maxiter=solver_maxiter,
         )
 
     def _J(self, x, mask=None):
