@@ -96,12 +96,12 @@ def _f(m1, m0, x, J, beta, R):
 
 
 def vector_tap_fp(m0, x, J, beta, R, tol: float = 1e-3, maxiter: int = 100):
-    def _fun(m, _x, _J, _beta, _R):
+    def _m_ness(m, _x, _J, _beta, _R):
         return _phi(_f(m, m, _x, _J, _beta, _R), _beta, _R)
 
     return (
         AndersonAcceleration(
-            fixed_point_fun=_fun,
+            fixed_point_fun=_m_ness,
             tol=tol,
             maxiter=maxiter,
         )
