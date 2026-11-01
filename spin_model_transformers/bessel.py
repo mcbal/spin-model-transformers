@@ -3,14 +3,20 @@ import jax.numpy as jnp
 import numpy as np
 
 
-def bessel_iv_ratio(x, nu, num_iter):
+def bessel_iv_ratio(x, nu, num_iter, *, min_order: int = 20):
     """Compute ratio `I_{\nu+1}(x) / I_{\nu}(x)` of modified Bessel functions of the first kind.
+
+    Args:
+        min_order: Minimum starting order for the approximation before downward
+            recurrence. Smaller values may require more refinement iterations.
+            Must be static when using JAX JIT, like nu and num_iter.
 
     Reference:
         D. E. Amos, Computation of Modified Bessel Functions and Their Ratios.
             Mathematics of Computation, 28(125), 239-251 (1974)
     """
-    v = np.maximum(20, nu)
+    # Keep the starting order an integer number of recurrence steps above nu.
+    v = nu + np.maximum(0, np.ceil(min_order - nu))
 
     idx_range = jnp.arange(num_iter)
     r_init = x / (v + idx_range + 0.5 + jnp.sqrt((v + idx_range + 1.5) ** 2 + x**2))
